@@ -25,6 +25,12 @@ interpret its queue and acknowledgment-service status with the body and other
 evidence. It does not prove end-to-end indexing. See [Input endpoint
 descriptions](https://help.splunk.com/en/splunk-enterprise/leverage-rest-apis/rest-api-reference/10.4/input-endpoints/input-endpoint-descriptions).
 
+`splunkctl` does not currently expose raw delivery, request-channel control,
+HEC health, or ACK polling. Treat those observations as administrator-supplied
+evidence unless an already-configured customer-preferred method safely exposes
+them inside the same approval and secret boundaries. Do not improvise a cURL or
+raw REST execution path.
+
 For Splunk Cloud Platform, verify sender-specific ACK availability and Cloud
 constraints before prescribing ACK; do not extrapolate Enterprise support. See
 [Splunk Cloud Platform service

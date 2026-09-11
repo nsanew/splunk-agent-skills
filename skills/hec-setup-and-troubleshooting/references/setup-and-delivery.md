@@ -29,8 +29,11 @@ Choose one documented administration surface:
 - Splunk Web: enable HEC as needed, create the token, bind allowed/default
   indexes, and set metadata. See [Enterprise HEC setup in Splunk
   Web](https://help.splunk.com/en/splunk-enterprise/get-started/get-data-in/10.4/get-data-with-http-event-collector/set-up-and-use-http-event-collector-in-splunk-web).
-- CLI: describe the documented commands for token creation, listing, update,
-  enablement, disablement, deletion, and submission; do not run them. See
+- splunkctl: prefer `splunkctl hec list`, `add`, `edit`, `enable`, `disable`,
+  and `remove` for supported token administration. Describe the exact command
+  discovered from `splunkctl schema --group hec --compact` or
+  `splunkctl hec --help`; do not run a mutating command without separate
+  explicit authority, and only then use its `splunkctl --yes ...` form. See
   [Enterprise HEC from the
   CLI](https://help.splunk.com/en/splunk-enterprise/get-started/get-data-in/10.4/get-data-with-http-event-collector/set-up-and-use-http-event-collector-from-the-cli).
 - Configuration files: describe the relevant global or per-token
@@ -55,12 +58,12 @@ the user's token is deployed or healthy.
   Web](https://help.splunk.com/en/splunk-enterprise/get-started/get-data-in/10.4/get-data-with-http-event-collector/set-up-and-use-http-event-collector-in-splunk-web).
 - Use `/services/collector/event` for a JSON envelope with an `event` value and
   optional `time`, `host`, `source`, `sourcetype`, `index`, and `fields`.
-- Use `/services/collector/raw` for raw event data. Supply a request channel as
-  documented when required, such as the `X-Splunk-Request-Channel` header or
-  supported query parameter.
-- Use `Authorization: Splunk $HEC_TOKEN`. Keep the token in an environment
-  variable managed outside the transcript; never paste, echo, log, or embed it
-  in a URL.
+- `splunkctl hec send` covers the event endpoint. Keep raw delivery, explicit
+  request-channel handling, health, and ACK polling advisory unless an
+  already-configured customer-preferred method safely supports them inside the
+  same approval and secret boundaries.
+- Keep the HEC token in environment-managed secret material outside the
+  transcript. Never paste, echo, log, or embed it in a URL or command example.
 
 See [Format events for
 HEC](https://help.splunk.com/en/splunk-enterprise/get-started/get-data-in/10.4/get-data-with-http-event-collector/format-events-for-http-event-collector)
@@ -72,31 +75,34 @@ for endpoint families.
 ## Bounded event test
 
 Have the user substitute a non-production receiver and approved test index. Do
-not run the request without separate explicit authority.
+not run the request without separate explicit authority. Prefer `splunkctl`
+when it is available:
 
 ```sh
-HEC_URL='https://<hec-host>:<port>'
-TEST_MARKER='hec-validation-<unique-id>'
-
-printf 'header = "Authorization: Splunk %s"\n' "$HEC_TOKEN" | \
-curl --silent --show-error --config - \
-  --header 'Content-Type: application/json' \
-  --data "{\"event\":{\"message\":\"$TEST_MARKER\"},\"index\":\"<approved-test-index>\",\"sourcetype\":\"<test-sourcetype>\",\"source\":\"hec-bounded-validation\"}" \
-  --write-out '\nHTTP_STATUS=%{http_code}\n' \
-  "$HEC_URL/services/collector/event"
+command -v splunkctl
+splunkctl --yes hec send \
+  --event '{"message":"hec-validation-<unique-id>"}' \
+  --index '<approved-test-index>' \
+  --sourcetype '<test-sourcetype>' \
+  --source 'hec-bounded-validation'
 ```
 
-Capture the HTTP status, response body, and request timestamp/timezone without
-capturing the authorization header. The public cURL examples are documented in
-[Use cURL with
-HEC](https://help.splunk.com/en/splunk-enterprise/get-started/get-data-in/10.4/get-data-with-http-event-collector/use-curl-to-manage-http-event-collector-tokens-events-and-services).
+Use the already configured host and environment-managed HEC token. Capture the
+structured response and request timestamp/timezone without capturing the token
+or authorization header. If `splunkctl` is unavailable, say so and use an
+already-configured customer-preferred HEC method only when it preserves the
+same non-production target, approved index, one-event bound, secret handling,
+and response capture.
+
+Splunkctl `v0.1.0` requires `--yes` for the HEC delivery and search POSTs. Use
+it only after the user approves the exact one-event delivery or read-only
+validation query; the confirmation never authorizes token administration or a
+wider mutation.
 
 Verify only the unique marker in the approved time window:
 
-```spl
-index="<approved-test-index>" sourcetype="<test-sourcetype>"
-source="hec-bounded-validation" "hec-validation-<unique-id>"
-| table _time host source sourcetype index _raw
+```sh
+splunkctl --yes search export 'index="<approved-test-index>" sourcetype="<test-sourcetype>" source="hec-bounded-validation" "hec-validation-<unique-id>" earliest=-15m latest=now | table _time host source sourcetype index _raw' --maxout 10 --output json
 ```
 
 The test is validated only when the response is successful and the matching

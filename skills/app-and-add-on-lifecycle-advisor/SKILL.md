@@ -135,6 +135,14 @@ Cloud self-service path.
   consequences; give documented or supplied alternatives and explicit next
   actions; and check checkpoint continuity, duplicate or concurrent inputs,
   routing changes, and data-loss risk before describing replacement readiness.
+  When status is evidenced but decisive replacement or migration-mechanics
+  evidence is missing, preserve that status, label migration readiness `Needs
+  review`, and give a staged, non-mutating evidence and validation plan instead
+  of stopping at the evidence request. Bind every stage to the applicable
+  product, version, deployment, evidence, owner, success threshold, stop
+  condition, and recovery action. Keep cutover blocked, do not invent a
+  replacement or rollback capability, and leave provider-managed Cloud actions
+  with the documented provider or Splunk Support owner.
 - **Removal:** distinguish cited disable/uninstall procedure from a safe-removal
   decision. Check dependencies and knowledge objects, active inputs, retained
   indexed data, user-directory cleanup, topology, restart or bundle deployment

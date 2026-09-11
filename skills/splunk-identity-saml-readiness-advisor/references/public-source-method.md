@@ -62,7 +62,9 @@ boundaries. Extract only the product evidence needed for the user's question.
 
 Do not execute a documented command merely because it appears on an official
 page. This skill authorizes public reading and the bounded existing-auth
-`splsearch` path only.
+`splunkctl`-preferred path only. If `splunkctl` is unavailable, an
+already-configured customer-preferred read-only method may be used only inside
+the same target, query, privacy, and output boundaries.
 
 ## Cite the answer, not the research process
 

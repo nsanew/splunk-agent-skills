@@ -370,11 +370,23 @@ The packager auto-generates `default/visualizations.conf` (with `framework_type 
 
 **Splunk Cloud Platform**: Private app installation requires the ACS CLI and AppInspect vetting. Do not direct Cloud users to the Splunk Web install UI — it will not work for private apps. Direct the user to the Splunk ACS documentation for the private app submission process.
 
-**Local Docker**: Copy the `.spl` into the container and install via the Splunk CLI:
+**Local Docker**: Copy the `.spl` into the container, then prefer `splunkctl`
+for the REST-backed install against the already-configured local test instance:
 ```
 docker cp dist/<app-id>-<version>-<hash>.spl <container>:/tmp/app.spl
-docker exec <container> /opt/splunk/bin/splunk install app /tmp/app.spl -update 1
+splunkctl --yes app install /tmp/app.spl --update 1 --output json
 ```
+
+Splunkctl `v0.1.0` requires `--yes` for this install POST. Use it only after the
+user explicitly approves the exact local instance, package, update behavior,
+and bounded non-production installation. It never authorizes a production or
+shared-environment install.
+
+If `splunkctl` is unavailable, say so and use the customer's explicitly
+approved, customer-preferred existing local install route only when it preserves the same
+non-production target and install scope. Never silently install or configure a
+client, and keep production or shared-environment installation behind separate
+explicit approval.
 
 ### 9. Tell the user
 

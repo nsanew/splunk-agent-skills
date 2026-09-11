@@ -96,6 +96,16 @@ blocker. Return `decision-blocked` when decisive evidence is absent or
 conflicting. Missing health, backup, owner, approval, or window evidence must
 produce a template and evidence request, not a readiness assertion.
 
+For a mixed or hybrid plan, decompose the work into named lanes before ordering
+it. Give each product, deployment type, topology, or accountable owner its own
+applicability boundary, prerequisites, documented sequence, evidence, stop
+condition, and recovery posture. Then state the cross-lane gates explicitly:
+which prerequisite or compatibility result unlocks the next lane, where an
+owner handoff or approval occurs, which baseline and recovery evidence must be
+shared, and what blocks the combined plan. Do not collapse unlike Enterprise,
+Cloud, cluster, standalone, or separately owned work into one generic timeline;
+keep the result planning-only and require separate authorization for execution.
+
 ### Rollback and recovery
 
 Report three separate questions:
@@ -126,6 +136,26 @@ only when a handoff is required for each applicable check:
 Separate documented procedures from telemetry-dependent results. Without both
 baseline and post-upgrade observation, keep the comparison unresolved and do
 not diagnose a regression.
+
+For a reported forwarder regression after an upgrade, keep the response in
+validation-planning scope. Preserve supplied pre- and post-upgrade observations
+by forwarder cohort, role, version, operating system, deployment owner, and
+receiver or indexer relationship. Return a comparison matrix with the exact
+baseline and postcheck window, ingestion continuity or lag signal, expected
+threshold, evidence source, accountable owner, and result for each affected and
+control cohort. Separate forwarder-side connectivity and queue evidence from
+receiver/indexer ingestion evidence so an aggregate drop is not treated as a
+proven forwarder root cause.
+
+If the evidence does not isolate the changed cohort or dependency, keep the
+regression conclusion `decision-blocked` and request only the missing cohort,
+version, time-window, and matching baseline/postcheck fields. Define a staged
+validation plan that changes one supported dependency dimension at a time,
+holds an unaffected cohort as the control, stops expansion on a failed
+threshold, and states the prior supported combination or recovery handoff. Do
+not restart, redeploy, roll back, or recommend fleet-wide rollout from this
+skill. Route active diagnosis or authorized remediation to the owning
+operations workflow while retaining the bounded evidence and validation plan.
 
 ## Smallest safe evidence route
 

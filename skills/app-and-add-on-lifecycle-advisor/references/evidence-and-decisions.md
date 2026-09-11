@@ -69,7 +69,7 @@ unknowns, and the next action. Documentation silence is `Needs review`, not
 | --- | --- | --- |
 | specific environment readiness | name/version, current and target Splunk versions, platform/topology, source/status, applicable release notes, AppInspect/vetting result when relevant | preserve supplied facts; return `Needs review` and request only absent fields |
 | install/upgrade/validation plan | platform, topology, app source/version, target Splunk version, intended location, active inputs, available validation results | give cited generic guidance only; mark readiness `Needs review` |
-| deprecation/EOL/migration | applicable release notes or vendor/app lifecycle record, Splunkbase record, active inputs/checkpoints/routing, migration guidance | do not assert status, dates, safety, or replacement readiness |
+| deprecation/EOL/migration | applicable release notes or vendor/app lifecycle record, Splunkbase record, active inputs/checkpoints/routing, migration guidance | preserve any evidenced lifecycle status; do not infer missing status, dates, alternative, safety, or replacement readiness; return `Needs review` and use the bounded plan below |
 | safe removal | app/version, platform/topology/location, app-specific removal guidance, dependencies/knowledge objects, active inputs/checkpoints, retained data, user directories, restart/bundle effects | return `Needs review`; give cited generic disable/uninstall guidance only |
 
 Request only fields relevant to the user's pending decision. If the user asks
@@ -108,6 +108,31 @@ configuration mapping, checkpoint transfer or reset behavior, concurrent-input
 overlap, routing and sourcetype/index changes, validation, rollback, and
 data-loss risk. Unknown checkpoint or routing behavior blocks migration safety,
 not the evidenced lifecycle status.
+
+If deprecation or EOL is evidenced but decisive replacement compatibility or
+migration-mechanics evidence remains unavailable, do not stop at the evidence
+request. Label migration readiness `Needs review` and provide a staged,
+non-mutating evidence and validation plan that:
+
+1. binds the current item and any candidate to the exact product, versions,
+   deployment, topology, and distribution source before comparing them;
+2. inventories active inputs, checkpoint ownership and transfer behavior,
+   routing, sourcetypes/indexes, dependencies, and the current supported
+   recovery posture;
+3. requires applicable lifecycle, migration, compatibility, AppInspect or
+   vetting evidence before treating a candidate or method as supported;
+4. defines a non-production or bounded pilot with a baseline, observable
+   success threshold, stop condition, and evidence-preserving recovery action;
+5. keeps production cutover, source disablement, and concurrent-input overlap
+   blocked until checkpoint continuity, routing, validation, and recovery gates
+   are evidenced; and
+6. assigns only documented provider-managed or account-specific Cloud actions
+   to the Splunk Cloud provider or Splunk Support owner.
+
+Name the evidence and owner required at each stage. Do not invent a replacement,
+schedule, checkpoint-transfer behavior, self-service Cloud path, or rollback
+capability. A recovery plan is not proof that in-place rollback is supported,
+and no plan step authorizes execution.
 
 ### Removal
 

@@ -13,24 +13,27 @@ hypotheses:
 3. identity-provider success/failure status or correlation identifier already
    available to the user, without assertions or tokens
 4. sanitized Splunk-visible authentication, mapping, role, or capability state
-5. a bounded, current-doc-supported log or state query through an existing-auth
-   read-only `splsearch` session
+5. a bounded, current-doc-supported log or state query through `splunkctl`, or
+   an already-configured customer-preferred read-only method when `splunkctl`
+   is unavailable and the same boundaries hold
 
 Stop when the next layer cannot change the recommendation. Absence of access
 to a layer is not evidence that the layer passed.
 
 ## Optional stack-read gate
 
-Before a `splsearch` read, require:
+Before a live read, require:
 
 - exact target URL supplied or confirmed by the user
+- `splunkctl` preferred when available; otherwise a warning and an
+  already-configured customer-preferred method inside the same safety boundary
 - existing auth status valid for that target, with no login or setup
 - a bounded time window and affected identity represented by a safe surrogate
   when possible
 - a query purpose tied to one documented expectation
 - a query reviewed as read-only, with no write, script, send, delete, collect,
   output, or remote side effect
-- an output-reduction and cleanup plan
+- server-side output reduction and a bounded result plan
 
 If any gate is missing, use public-doc-guided manual checks instead. Do not ask
 the user to paste or provision credentials.
@@ -44,7 +47,7 @@ For each read, retain only:
 - query purpose and a redacted query description
 - row count, aggregate state, or the smallest sanitized excerpt
 - limitations, missing fields, and conflicting observations
-- local result-table cleanup status
+- search-job cancellation status when a detached job was used
 
 Keep observed stack facts under their own heading. Never convert one stack's
 state into a general product claim.
